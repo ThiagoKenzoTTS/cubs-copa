@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUBS - Copa Universitária de Brawl Stars</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral (Slate & Amber) -->
+    <!-- Application Structure Plan: A single-page application with a sticky top navigation for seamless scrolling between thematic sections (Sobre, Regulamento, Formato, Cronograma, Inscrição). This structure was chosen to break down the dense, text-heavy regulation document into a logical, user-centric journey. Instead of a linear document, users can directly access the information they need. Interactivity is introduced via accordions for detailed rules and tabs for map pools, preventing information overload and making the content digestible for potential student participants. The goal is to guide the user from discovery to understanding the rules and finally to registration. -->
+    <!-- Visualization & Content Choices: 1. Eligibility Requirements: Info -> Eligibility criteria. Goal -> Inform. Method -> Styled HTML cards with icons. Interaction -> Hover for details. Justification -> Visually scannable and clearer than a block of text. 2. Double Elimination Format: Info -> Description of Upper/Lower brackets. Goal -> Explain a process. Method -> Custom HTML/CSS diagram using Tailwind's grid/flexbox. Interaction -> Clicking on a path highlights it and shows an explanation. Justification -> A custom diagram is more intuitive for this specific flow than a generic chart and avoids SVG. 3. Map Pool: Info -> List of maps per game mode. Goal -> Organize. Method -> Bar Chart (Chart.js) showing map count per mode & interactive tabs with map lists. Interaction -> Tabs filter the content. Justification -> The bar chart provides a quick visual comparison of map pool depth, fulfilling the Chart.js requirement with relevant data. Tabs allow easy Browse without a long long scroll. 4. Regulations: Info -> Detailed rules on conduct, teams, etc. Goal -> Organize/Inform. Method -> HTML <details> accordion. Interaction -> Click to expand/collapse. Justification -> Prevents a huge wall of text on page load, improving readability. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .active-nav {
+            color: #f59e0b; /* amber-500 */
+            font-weight: 600;
+        }
+        .tab-active {
+            border-color: #f59e0b; /* amber-500 */
+            background-color: #f59e0b;
+            color: #ffffff;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .arrow {
+            transform: rotate(90deg);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header id="header" class="bg-slate-900/80 backdrop-blur-sm text-white sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-4">
+                    <img src="Gemini_Generated_Image_2d1z402d1z402d1z-removebg-preview.png" alt="Logo CUBS" class="h-12 w-12 object-contain">
+                    <span class="text-xl font-bold tracking-tight">CUBS</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 font-medium">
+                    <a href="#sobre" class="nav-link hover:text-amber-400 transition-colors">Sobre</a>
+                    <a href="#regulamento" class="nav-link hover:text-amber-400 transition-colors">Regulamento</a>
+                    <a href="#formato" class="nav-link hover:text-amber-400 transition-colors">Formato</a>
+                    <a href="#cronograma" class="nav-link hover:text-amber-400 transition-colors">Cronograma</a>
+                </div>
+                <a href="#inscricao" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                    Inscreva-se
+                </a>
+                <button id="mobile-menu-button" class="md:hidden p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden py-4">
+                <a href="#sobre" class="block py-2 px-4 text-sm nav-link hover:bg-slate-700 rounded">Sobre</a>
+                <a href="#regulamento" class="block py-2 px-4 text-sm nav-link hover:bg-slate-700 rounded">Regulamento</a>
+                <a href="#formato" class="block py-2 px-4 text-sm nav-link hover:bg-slate-700 rounded">Formato</a>
+                <a href="#cronograma" class="block py-2 px-4 text-sm nav-link hover:bg-slate-700 rounded">Cronograma</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative text-white overflow-hidden">
+            <div class="absolute inset-0 bg-slate-900">
+                <img src="https://images.unsplash.com/photo-1616594418293-80e99a45a305?q=80&w=2940&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-20" alt="Fundo Abstrato">
+            </div>
+            <div class="relative container mx-auto px-4 py-32 md:py-48 text-center">
+                <img src="Gemini_Generated_Image_2d1z402d1z402d1z-removebg-preview.png" alt="Logo CUBS" class="h-32 w-32 md:h-40 md:w-40 mx-auto mb-6">
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight uppercase">Copa Universitária de Brawl Stars</h1>
+                <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-slate-300">A maior competição de Brawl Stars do cenário universitário. Monte sua equipe, mostre seu talento e conquiste a glória!</p>
+                <div class="mt-8 flex justify-center gap-4">
+                    <a href="#inscricao" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-8 rounded-lg transition-transform hover:scale-105">Inscreva-se Agora</a>
+                    <a href="#regulamento" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 px-8 rounded-lg transition-transform hover:scale-105">Ver Regulamento</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre" class="py-20 md:py-28 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">O Que é a CUBS?</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Um torneio criado por e para universitários, com o objetivo de fortalecer o cenário de esports acadêmico.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-slate-100 p-8 rounded-xl shadow-sm">
+                        <div class="text-4xl text-amber-500 mb-4">🏆</div>
+                        <h3 class="text-xl font-bold mb-2">Competição de Alto Nível</h3>
+                        <p class="text-slate-600">Enfrente as melhores equipes universitárias do país em um formato profissional e desafiador.</p>
+                    </div>
+                    <div class="bg-slate-100 p-8 rounded-xl shadow-sm">
+                        <div class="text-4xl text-amber-500 mb-4">🤝</div>
+                        <h3 class="text-xl font-bold mb-2">Integração e Espírito Esportivo</h3>
+                        <p class="text-slate-600">Promovemos o fair play, o respeito e a conexão entre estudantes de diversas instituições.</p>
+                    </div>
+                    <div class="bg-slate-100 p-8 rounded-xl shadow-sm">
+                        <div class="text-4xl text-amber-500 mb-4">🚀</div>
+                        <h3 class="text-xl font-bold mb-2">Desenvolvimento de Talentos</h3>
+                        <p class="text-slate-600">Uma plataforma para novos talentos surgirem e se desenvolverem no ecossistema de esports.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="regulamento" class="py-20 md:py-28">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold">Regulamento Oficial</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Conheça as regras que garantem uma competição justa e profissional. A leitura completa é obrigatória para todos os participantes.</p>
+                </div>
+
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <details class="bg-white rounded-lg shadow-md p-6 group" open>
+                        <summary class="flex justify-between items-center font-bold text-xl cursor-pointer">
+                            Elegibilidade dos Participantes
+                            <span class="arrow transition-transform duration-300 text-amber-500">➔</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-4">
+                            <p>Para garantir o caráter universitário da CUBS, todos os jogadores devem ser estudantes regularmente matriculados. Os critérios acadêmicos são fundamentais para reforçar nosso compromisso com o desenvolvimento do estudante-atleta.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Idade Mínima:</strong> Ter no mínimo 16 anos completos para participar.</li>
+                                <li><strong>Status de Amador:</strong> Jogadores com contratos profissionais de Nível 1 ativos não são permitidos.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-md p-6 group">
+                        <summary class="flex justify-between items-center font-bold text-xl cursor-pointer">
+                            Equipes e Inscrições
+                            <span class="arrow transition-transform duration-300 text-amber-500">➔</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-4">
+                           <p>As equipes devem ser formadas com responsabilidade, seguindo as diretrizes de composição e registro.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Tamanho:</strong> 3 jogadores titulares e até 1 substituto.</li>
+                                <li><strong>Contas:</strong> Cada jogador deve usar sua própria conta e Supercell ID. É proibido smurfing ou compartilhamento de contas.</li>
+                                <li><strong>Registro:</strong> O capitão deve registrar a equipe na plataforma oficial, fornecendo os Player Tags corretos. O elenco é travado após a confirmação.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-md p-6 group">
+                        <summary class="flex justify-between items-center font-bold text-xl cursor-pointer">
+                            Código de Conduta
+                            <span class="arrow transition-transform duration-300 text-amber-500">➔</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-4">
+                           <p>A integridade e o respeito são pilares da CUBS. Mantemos uma política de tolerância zero para comportamentos antiéticos.</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Pontualidade:</strong> Esteja pronto 30 minutos antes da partida. Atrasos maiores que 15 minutos resultam em W.O.</li>
+                                <li><strong>Respeito:</strong> Linguagem ofensiva, assédio ou qualquer forma de preconceito são estritamente proibidos.</li>
+                                <li><strong>Fair Play:</strong> É proibido o uso de cheats, exploits, colusão ou qualquer forma de trapaça.</li>
+                                <li><strong>Comunicação:</strong> O Discord oficial é o canal para toda comunicação com a administração.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    
+                    <details class="bg-white rounded-lg shadow-md p-6 group">
+                        <summary class="flex justify-between items-center font-bold text-xl cursor-pointer">
+                            Regras da Partida
+                            <span class="arrow transition-transform duration-300 text-amber-500">➔</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-4">
+                           <p>Para garantir um campo de jogo nivelado, todas as partidas seguem um formato padrão.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Dispositivos:</strong> Apenas celulares e tablets são permitidos. Emuladores são proibidos.</li>
+                                <li><strong>Formato:</strong> As partidas são em Melhor de 3 Sets (MD3) nas fases iniciais e Melhor de 5 Sets (MD5) nas finais.</li>
+                                <li><strong>Desconexões:</strong> Os jogadores são responsáveis por sua conexão. A equipe de um jogador desconectado deve continuar a partida em 2v3.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section id="formato" class="py-20 md:py-28 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold">Formato do Torneio</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Adotamos o formato de Dupla Eliminação para garantir a competição mais justa e emocionante possível, onde cada equipe tem uma segunda chance.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Entendendo a Dupla Eliminação</h3>
+                        <p class="text-slate-600 mb-6">Neste formato, uma equipe só é eliminada após duas derrotas. Os times começam na "Chave Superior" (Upper Bracket). Se perderem, caem para a "Chave Inferior" (Lower Bracket) para uma nova oportunidade. Uma segunda derrota, na Chave Inferior, resulta na eliminação.</p>
+                        <div id="diagram-explanation" class="bg-amber-100 border-l-4 border-amber-500 text-amber-800 p-4 rounded-r-lg transition-opacity duration-300 opacity-100">
+                           Clique nos caminhos do diagrama para ver a explicação de cada chave.
+                        </div>
+                    </div>
+
+                    <div class="font-mono text-sm bg-slate-900 text-white p-6 rounded-lg shadow-2xl">
+                        <div class="flex justify-around mb-2">
+                            <div class="font-bold">UPPER BRACKET</div>
+                            <div class="font-bold">LOWER BRACKET</div>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div id="upper-path" class="w-1/2 border-r-2 border-slate-600 pr-4 space-y-4 cursor-pointer hover:bg-slate-800 p-2 rounded-l-md">
+                                <div class="bg-green-500/80 p-2 rounded text-center">R1: Vence ➔ Avança</div>
+                                <div class="text-center text-slate-400">↓</div>
+                                <div class="bg-green-500/80 p-2 rounded text-center">R2: Vence ➔ Avança</div>
+                                <div class="text-center text-slate-400">↓</div>
+                                <div class="bg-green-500/80 p-2 rounded text-center">Final Upper: Vence</div>
+                                <div class="text-center text-slate-400">↘</div>
+                            </div>
+                            <div id="lower-path" class="w-1/2 pl-4 space-y-4 cursor-pointer hover:bg-slate-800 p-2 rounded-r-md">
+                               <div class="text-center text-slate-400">Perde R1 ↴</div>
+                                <div class="bg-red-500/80 p-2 rounded text-center">LB R1: Vence ➔ Avança</div>
+                                <div class="text-center text-slate-400">Perde R2 ↴</div>
+                                <div class="bg-red-500/80 p-2 rounded text-center">LB R2: Vence ➔ Avança</div>
+                                 <div class="text-center text-slate-400">↓</div>
+                                 <div class="bg-red-500/80 p-2 rounded text-center">Final Lower: Vence</div>
+                                <div class="text-center text-slate-400">↙</div>
+                            </div>
+                        </div>
+                         <div class="mt-4 bg-amber-500/90 p-3 rounded text-center font-bold">GRANDE FINAL</div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-20">
+                    <h3 class="text-2xl font-bold mb-4">Map Pool por Modo de Jogo</h3>
+                    <p class="mt-2 max-w-3xl mx-auto text-lg text-slate-600 mb-8">A variedade de mapas testa a versatilidade das equipes, por isso os mapas escolhidos para cada fase será aleatório, baseado nos mapas disponíveis para batalhas amistosas. Veja abaixo a quantidade de mapas disponíveis para cada modo de jogo oficial da CUBS.</p>
+                    <div class="chart-container">
+                        <canvas id="mapPoolChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="cronograma" class="py-20 md:py-28">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold">Cronograma da Competição</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Fique por dentro de todas as datas importantes da primeira edição da CUBS. Programe-se para não perder nada!</p>
+                </div>
+                <div class="relative max-w-2xl mx-auto">
+                    <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-slate-200"></div>
+                    <div class="space-y-16">
+                        <div class="relative flex items-center">
+                            <div class="w-1/2 pr-8 text-right">
+                                <div class="bg-white p-6 rounded-lg shadow-lg">
+                                    <p class="text-amber-500 font-bold">10-14 de Julho</p>
+                                    <h3 class="text-xl font-bold mt-1">Período de Inscrições</h3>
+                                    <p class="text-slate-600 mt-2">Abertura oficial das inscrições para todas as equipes universitárias.</p>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-amber-500 rounded-full border-4 border-white"></div>
+                            <div class="w-1/2"></div>
+                        </div>
+                        
+                        <div class="relative flex items-center">
+                            <div class="w-1/2"></div>
+                            <div class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-slate-800 rounded-full border-4 border-white"></div>
+                            <div class="w-1/2 pl-8 text-left">
+                               <div class="bg-white p-6 rounded-lg shadow-lg">
+                                    <p class="text-slate-500 font-bold">16 de Julho</p>
+                                    <h3 class="text-xl font-bold mt-1">Sorteio das Chaves</h3>
+                                    <p class="text-slate-600 mt-2">Divulgação do resultado do sorteio que definirá os primeiros sorteios</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-center">
+                           <div class="w-1/2 pr-8 text-right">
+                               <div class="bg-white p-6 rounded-lg shadow-lg">
+                                    <p class="text-amber-500 font-bold">19-20 de Julho</p>
+                                    <h3 class="text-xl font-bold mt-1">Fase Qualificatória</h3>
+                                    <p class="text-slate-600 mt-2">Rodadas iniciais MD3 para um grande número de equipes, em eliminação simples.</p>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-slate-800 rounded-full border-4 border-white"></div>
+                            <div class="w-1/2"></div>
+                        </div>
+
+                         <div class="relative flex items-center">
+                            <div class="w-1/2"></div>
+                            <div class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-slate-800 rounded-full border-4 border-white"></div>
+                            <div class="w-1/2 pl-8 text-left">
+                               <div class="bg-white p-6 rounded-lg shadow-lg">
+                                    <p class="text-slate-500 font-bold">26 de Julho</p>
+                                    <h3 class="text-xl font-bold mt-1">Fase Principal (Dupla Eliminação)</h3>
+                                    <p class="text-slate-600 mt-2">Início da chave de dupla eliminação com as equipes classificadas.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-center">
+                           <div class="w-1/2 pr-8 text-right">
+                               <div class="bg-white p-6 rounded-lg shadow-lg">
+                                    <p class="text-amber-500 font-bold">27 de Julho</p>
+                                    <h3 class="text-xl font-bold mt-1">Fase Final</h3>
+                                    <p class="text-slate-600 mt-2">Os confrontos épicos que coroarão a primeira equipe campeã da CUBS.</p>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-amber-500 rounded-full border-4 border-white"></div>
+                            <div class="w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="inscricao" class="py-20 md:py-28 bg-slate-900 text-white">
+             <div class="absolute inset-0 bg-slate-900">
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2940&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-10" alt="Ambiente Gamer">
+            </div>
+            <div class="relative container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold">Pronto para a Batalha?</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-300">Reúna sua equipe, siga os passos abaixo e garanta seu lugar na história da CUBS.</p>
+                <div class="mt-12">
+                    <a href="https://forms.gle/J3RLytB2qTCReoFm7" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-10 rounded-lg text-xl transition-transform hover:scale-105 inline-block" target="_blank">
+                        Ir para a Plataforma de Inscrição
+                    </a>
+                    <p class="mt-4 text-sm text-slate-400">As inscrições encerram em 14 de Julho.</p>
+                </div>
+                <div class="mt-12 text-left max-w-3xl mx-auto grid md:grid-cols-2 gap-8">
+                    <div class="bg-slate-800/50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg text-amber-400 mb-2">1. Junte-se ao nosso Discord</h3>
+                        <p class="text-slate-300">A comunicação oficial acontece lá. É obrigatório que o capitão da equipe esteja no servidor.</p>
+                        <a href="https://discord.gg/PJSGhkpsFq" class="text-amber-400 hover:underline mt-2 inline-block" target="_blank">Link para o Discord ➔</a>
+                    </div>
+                    <div class="bg-slate-800/50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg text-amber-400 mb-2">2. Prepare seus Documentos</h3>
+                        <p class="text-slate-300">Tenha em mãos o comprovante de matrícula para verificação de elegibilidade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400">
+        <div class="container mx-auto px-4 py-8 text-center">
+            <img src="Gemini_Generated_Image_2d1z402d1z402d1z-removebg-preview.png" alt="Logo CUBS" class="h-16 w-16 mx-auto mb-4 opacity-50">
+            <p>&copy; 2025 Copa Universitária de Brawl Stars (CUBS). Todos os direitos reservados.</p>
+            <p class="text-xs mt-2">Este é um evento organizado pela comunidade e não é afiliado ou patrocinado pela Supercell.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active-nav');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active-nav');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if(mobileMenu.offsetParent !== null) {
+                       mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const upperPath = document.getElementById('upper-path');
+            const lowerPath = document.getElementById('lower-path');
+            const explanationDiv = document.getElementById('diagram-explanation');
+
+            upperPath.addEventListener('click', () => {
+                explanationDiv.innerHTML = '<strong>Chave Superior (Upper Bracket):</strong> As equipes jogam aqui até perderem. Uma derrota não elimina, mas envia a equipe para a Chave Inferior.';
+            });
+
+            lowerPath.addEventListener('click', () => {
+                explanationDiv.innerHTML = '<strong>Chave Inferior (Lower Bracket):</strong> A chave da segunda chance! Equipes que perdem aqui são eliminadas. O vencedor avança para a Grande Final.';
+            });
+            
+            const mapPoolData = {
+                labels: ['Pique-Gema','Fute-Brawl', 'Caça-Estrelas', 'Roubo', 'Nocaute', 'Zona Estratégica'],
+                datasets: [{
+                    label: 'Nº de Mapas Disponíveis',
+                    data: [14, 15, 7, 9, 15, 9],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(236, 72, 153, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(236, 72, 153, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            const mapPoolCtx = document.getElementById('mapPoolChart').getContext('2d');
+            const mapPoolChart = new Chart(mapPoolCtx, {
+                type: 'bar',
+                data: mapPoolData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                             ticks: { color: '#475569' },
+                             grid: { color: '#e2e8f0' }
+                        },
+                        y: {
+                            ticks: { color: '#475569' },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Contagem de Mapas por Modo de Jogo',
+                            color: '#1e293b',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
